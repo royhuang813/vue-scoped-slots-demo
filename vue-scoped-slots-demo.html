@@ -1,0 +1,110 @@
+<!-- vue作用域插槽demo -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue-scoped-slots-demo</title>
+  <style>
+    .table {
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 20px;
+      border: 1px solid #000;
+    }
+    .red {
+      color: red;
+    }
+    .blue {
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <demo-form :columns="columns" :list="data" @row-click="rowClick">
+      <template #name="{col}">
+        <span class="red">{{col}}</span>
+      </template>
+      <template #age="{col}">
+        <button class="blue">{{col}}</button>
+      </template>
+      <template #gender="{col}">
+        <span v-if="col === 0">男</span>
+        <span v-if="col === 1">女</span>
+      </template>
+    </demo-form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+  <script>
+    Vue.component('demo-form', {
+      template: `
+        <div class="demo-form">
+          <table class="table">
+            <thead>
+              <tr>
+                <th v-for="(col, i) in columns" :key="i">{{col.title}}</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(data, i) in list" :key="i" @click="$emit('row-click', data)">
+                  <td v-for="(v, k) in data" :key="k">
+                    <slot :name="k" :col="v">{{v}}</slot>
+                  </td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      props: {
+        columns: { type: Array, require: true },
+        list: { type: Array, require: true }
+      }
+    })
+
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          columns: [
+            {
+              title: 'name'
+            },
+            {
+              title: 'age'
+            },
+            {
+              title: 'gender'
+            },
+          ],
+          data: [
+            {
+              name: 'qq',
+              age: 18,
+              gender: 0,
+            },
+            {
+              name: 'ww',
+              age: 24,
+              gender: 1,
+            },
+            {
+              name: 'ee',
+              age: 30,
+              gender: 0,
+            }
+          ]
+        }
+      },
+      methods: {
+        rowClick(row) {
+          console.log('row-data', row)
+        }
+      }
+    })
+
+  </script>
+</body>
+</html>
